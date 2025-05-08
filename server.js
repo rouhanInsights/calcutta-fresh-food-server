@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+
 const userRoutes = require("./routes/userRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
@@ -9,22 +10,29 @@ const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const slotRoutes = require("./routes/slotRoutes");
 const otpRoutes = require("./routes/otpRoutes");
+const greetingRoutes = require("./routes/greetingRoutes");
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: "http://localhost:3000", // or your frontend deployment
+  credentials: true,
+}));
+
 app.use(express.json());
-// Routes
+
+// Route mounts
 app.use("/api/users", userRoutes);
+app.use("/api/users", otpRoutes); 
 app.use("/api/users/addresses", addressRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/slots", slotRoutes);
-app.use("/api/users", otpRoutes);
-
+app.use("/api/greetings", greetingRoutes);
 
 // Root test
 app.get("/", (req, res) => {

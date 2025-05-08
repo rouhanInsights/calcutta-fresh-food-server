@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
+const { verifyToken } = require("../middleware/authMiddleware");
 const {
-  getAllAddresses,
-  addAddress,
-  deleteAddress,
+  getalladdress,
+  addaddress,
+  deleteaddress
 } = require("../controllers/addressController");
 
-router.get("/", getAllAddresses);
-router.post("/", addAddress);
-router.delete("/:id", deleteAddress);
+// 🔐 Protected routes
+router.get("/", verifyToken, getalladdress);
+router.post("/", verifyToken, addaddress);
+router.delete("/:id", verifyToken, deleteaddress);
 
 module.exports = router;

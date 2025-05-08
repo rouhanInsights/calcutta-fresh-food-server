@@ -1,14 +1,12 @@
 const express = require("express");
+// ✅ Import both controllers
+const { verifyToken } = require("../middleware/authMiddleware");
+const { getUserProfile, updateUserProfile } = require("../controllers/userController");
+
 const router = express.Router();
 
-// ✅ Import both controllers
-const {
-  getUserProfile,
-  updateUserProfile,
-} = require("../controllers/userController");
-
 // ✅ Routes
-router.get("/profile", getUserProfile);
-router.put("/profile", updateUserProfile);
+router.get("/profile", verifyToken, getUserProfile);
+router.put("/profile", verifyToken, updateUserProfile);
 
 module.exports = router;
