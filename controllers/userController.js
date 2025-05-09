@@ -18,17 +18,18 @@ const getUserProfile = async (req, res) => {
 };
 
 const updateUserProfile = async (req, res) => {
-  const userId = req.user.userId; // ✅ FIXED: Use decoded token
-  const {
-    name,
-    phone,
-    alt_phone,
-    email,
-    alt_email,
-    dob,
-    gender,
-    profile_image_url
-  } = req.body;
+  const userId = req.user.userId;
+
+  const clean = (val) => (typeof val === "string" && val.trim() === "") ? null : val;
+
+  const name = clean(req.body.name);
+  const phone = clean(req.body.phone);
+  const alt_phone = clean(req.body.alt_phone);
+  const email = clean(req.body.email);
+  const alt_email = clean(req.body.alt_email);
+  const dob = req.body.dob;
+  const gender = clean(req.body.gender);
+  const profile_image_url = clean(req.body.profile_image_url);
 
   try {
     const result = await pool.query(
@@ -41,11 +42,14 @@ const updateUserProfile = async (req, res) => {
     );
 
     res.json({ message: "Profile updated successfully.", user: result.rows[0] });
+    // console.log("Received in backend:", req.body);
+
   } catch (err) {
     console.error("Update Profile Error:", err.message);
     res.status(500).json({ error: "Failed to update profile" });
   }
 };
+
 
 module.exports = {
   getUserProfile,

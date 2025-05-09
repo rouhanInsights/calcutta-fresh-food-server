@@ -85,9 +85,74 @@ const deleteaddress = async (req, res) => {
     res.status(500).json({ error: "Failed to delete address" });
   }
 };
+const editaddress = async (req, res) => {
+  const userId = req.user.userId;
+  const addressId = req.params.id;
+  const {
+    name,
+    phone,
+    address_line1,
+    address_line2,
+    city,
+    state,
+    pincode,
+    is_default = false,
+    floor_no,
+    landmark,
+  } = req.body;
 
+  try {
+    // If making this address default, clear others
+    if (is_default) {
+      await pool.query(
+        `UPDATE cust_addresses SET is_default = false WHERE user_id = $1`,
+        [userId]
+      );
+    }
+
+    const result = await pool.query(
+      `UPDATE cust_addresses SET
+        name = $1,
+        phone = $2,
+        address_line1 = $3,
+        address_line2 = $4,
+        city = $5,
+        state = $6,
+        pincode = $7,
+        is_default = $8,
+        floor_no = $9,
+        landmark = $10
+      WHERE address_id = $11 AND user_id = $12
+      RETURNING *`,
+      [
+        name,
+        phone,
+        address_line1,
+        address_line2,
+        city,
+        state,
+        pincode,
+        is_default,
+        floor_no,
+        landmark,
+        addressId,
+        userId,
+      ]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(403).json({ error: "Unauthorized edit attempt" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Edit Address Error:", err.message);
+    res.status(500).json({ error: "Failed to update address" });
+  }
+};
 module.exports = {
   getalladdress,
   addaddress,
   deleteaddress,
+  editaddress,
 };
